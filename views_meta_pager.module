@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Main file for hooks.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_meta_pager_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Implements hook_page_alter().
+ */
+function views_meta_pager_page_alter(&$page) {
+  if (path_is_admin(current_path())) {
+    return;
+  }
+
+  $view = views_get_page_view();
+
+  if (!empty($view)) {
+    // If enabled and only for pager with offset 0 (main pager for page with
+    // multiple pagers).
+    if ($view->display_handler->get_option('views_meta_pager_enabled') && $view->query->pager->get_offset() == 0) {
+      global $base_url;
+      $current_page = $view->query->pager->get_current_page();
+      $items_per_page = $view->query->pager->get_items_per_page();
+      $total_items = $view->query->pager->get_total_items();
+
+      $need_prev = $current_page == 0 ? FALSE : TRUE;
+      $need_next = floor($total_items / $items_per_page) - 1 > $current_page ? TRUE : FALSE;
+
+      $current_path = current_path();
+
+      if ($need_prev) {
+        $element = array(
+          '#tag' => 'link',
+          '#attributes' => array(
+            'href' => $base_url . '/' . $current_path . '?' . drupal_http_build_query(array('page' => $current_page - 1)),
+            'rel' => 'prev',
+          ),
+        );
+        drupal_add_html_head($element, 'views_metra_pager_rel_prev');
+      }
+
+      if ($need_next) {
+        $element = array(
+          '#tag' => 'link',
+          '#attributes' => array(
+            'href' => $base_url . '/' . $current_path . '?' . drupal_http_build_query(array('page' => $current_page + 1)),
+            'rel' => 'next',
+          ),
+        );
+        drupal_add_html_head($element, 'views_metra_pager_rel_next');
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+name = Views Meta Page
+description = Adds metatags with rel next\prev for views pager.
+core = 7.x
+version = 7.x-1.x
+
+dependencies[] = views
+
+files[] = views_meta_pager_plugin.inc
