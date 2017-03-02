@@ -34,31 +34,42 @@ function views_meta_pager_page_alter(&$page) {
       $total_items = $view->query->pager->get_total_items();
 
       $need_prev = $current_page == 0 ? FALSE : TRUE;
-      $need_next = floor($total_items / $items_per_page) - 1 > $current_page ? TRUE : FALSE;
+      if ($total_items == 0 || $items_per_page == 0) {
+        $need_next = FALSE;
+      }
+      else {
+        $need_next = floor($total_items / $items_per_page) - 1 > $current_page ? TRUE : FALSE;
+      }
 
       $current_path = current_path();
 
       if ($need_prev) {
+        $href = $base_url . '/' . $current_path;
+        // For first page we don't need ?page=0, we must redirect on page itself
+        // This is good for SEO and will be same as menu items.
+        if (($current_page - 1) > 0) {
+          $href .= '?' . drupal_http_build_query(array('page' => $current_page - 1));
+        }
         $element = array(
           '#tag' => 'link',
           '#attributes' => array(
-            'href' => $base_url . '/' . $current_path . '?' . drupal_http_build_query(array('page' => $current_page - 1)),
+            'href' => $href,
             'rel' => 'prev',
           ),
         );
-        drupal_add_html_head($element, 'views_metra_pager_rel_prev');
       }
+      drupal_add_html_head($element, 'views_metra_pager_rel_prev');
+    }
 
-      if ($need_next) {
-        $element = array(
-          '#tag' => 'link',
-          '#attributes' => array(
-            'href' => $base_url . '/' . $current_path . '?' . drupal_http_build_query(array('page' => $current_page + 1)),
-            'rel' => 'next',
-          ),
-        );
-        drupal_add_html_head($element, 'views_metra_pager_rel_next');
-      }
+    if ($need_next) {
+      $element = array(
+        '#tag' => 'link',
+        '#attributes' => array(
+          'href' => $base_url . '/' . $current_path . '?' . drupal_http_build_query(array('page' => $current_page + 1)),
+          'rel' => 'next',
+        ),
+      );
+      drupal_add_html_head($element, 'views_metra_pager_rel_next');
     }
   }
 }
