@@ -57,8 +57,9 @@ function views_meta_pager_page_alter(&$page) {
             'rel' => 'prev',
           ),
         );
-      }
-      drupal_add_html_head($element, 'views_metra_pager_rel_prev');
+        
+        drupal_add_html_head($element, 'views_metra_pager_rel_prev');
+      }      
     }
 
     if ($need_next) {
